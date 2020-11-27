@@ -39,4 +39,18 @@ docker_build: ## Build Docker file
 
 help: ## Print this help
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
-          
+
+### linkbusters custom stuff goes below
+VERSION=2.0.0
+ECR_PRD=318399264588.dkr.ecr.eu-west-1.amazonaws.com
+
+docker_build: ## Build docker image
+	docker build . -t celery-exporter:${VERSION}
+
+docker_tag_prd: ## Tag docker image with production repo url
+	docker tag celery-exporter:${VERSION} ${ECR_PRD}/celery-exporter:${VERSION}
+
+docker_push_prd: ## Push docker image to production
+	docker push ${ECR_PRD}/celery-exporter:${VERSION}
+
+docker_push_all: docker_build docker_tag_prd docker_push_prd ## Build docker image and push it to all configured repos
